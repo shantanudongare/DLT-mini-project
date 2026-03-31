@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Money Transfer Game | Learn Blockchain</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- ANIMATED BACKGROUND -->
+    <div class="animated-bg"></div>
+
+    <!-- HEADER / TITLE -->
+    <div class="header">
+        <div class="header-content">
+            <h1>💰 Money Transfer Game</h1>
+            <p>Learn how banks and cryptocurrencies work - see the DIFFERENCE!</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- GAME INSTRUCTIONS -->
+        <section class="intro-banner">
+            <h2>📖 How to Play:</h2>
+            <p>Choose a system, send money between friends, break things, and see what happens! 🎮</p>
+            <div class="instruction-dots">
+                <span class="dot">1️⃣ Pick System</span>
+                <span class="dot">2️⃣ Send Money</span>
+                <span class="dot">3️⃣ Break It</span>
+                <span class="dot">4️⃣ Learn</span>
+            </div>
+        </section>
+
+        <!-- SYSTEM SELECTOR -->
+        <section class="system-selector">
+            <h2>🎮 Choose Your Mode:</h2>
+            <div class="mode-cards">
+                <div class="mode-card" data-system="centralized" onclick="selectSystem('centralized')">
+                    <div class="mode-icon">🏦</div>
+                    <h3>Bank Mode</h3>
+                    <p>One central bank handles everything</p>
+                    <div class="mode-badge">Faster but fragile 🥣</div>
+                </div>
+                <div class="mode-card" data-system="decentralized" onclick="selectSystem('decentralized')">
+                    <div class="mode-icon">⛓️</div>
+                    <h3>Crypto Mode</h3>
+                    <p>Many computers work together</p>
+                    <div class="mode-badge">Slower but stronger 💪</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRANSACTION CONTROL -->
+        <section class="control-panel">
+            <h2>💳 Send Money</h2>
+            
+            <div class="preset-buttons">
+                <button onclick="quickTransaction('Alice', 'Bob', 50)" class="quick-btn">
+                    Quick: Alice → Bob (50)
+                </button>
+                <button onclick="quickTransaction('Charlie', 'Diana', 75)" class="quick-btn">
+                    Quick: Charlie → Diana (75)
+                </button>
+                <button onclick="quickTransaction('Eve', 'Frank', 100)" class="quick-btn">
+                    Quick: Eve → Frank (100)
+                </button>
+            </div>
+
+            <h3>Or type your own:</h3>
+            <div class="transaction-input">
+                <input type="text" id="sender" placeholder="Who sends? (e.g., Alice)" maxlength="20">
+                <input type="text" id="receiver" placeholder="Who receives? (e.g., Bob)" maxlength="20">
+                <input type="number" id="amount" placeholder="How much? (e.g., 50)" min="1" step="1" max="999">
+                <button onclick="addTransaction()" class="btn-primary">💸 Send!</button>
+            </div>
+
+            <div class="action-buttons-row">
+                <button onclick="simulateFailure()" class="btn-danger">⚠️ Break It!</button>
+                <button onclick="restoreSystem()" class="btn-success">✅ Fix It!</button>
+                <button onclick="clearAllData()" class="btn-warning">🔄 Reset</button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </section>
+
+        <!-- GAME AREA - TWO SYSTEMS -->
+        <section class="game-area">
+            <!-- BANK MODE (Centralized) -->
+            <div class="game-card centralized-section" id="centralized-section" style="display: none;">
+                <div class="card-header bank">
+                    <h2>🏦 Bank Mode</h2>
+                </div>
+
+                <div class="card-content">
+                    <!-- STATUS -->
+                    <div class="status-display">
+                        <div class="status-item">
+                            <div class="status-label">Server Status</div>
+                            <div class="status-indicator" id="cent-status-icon">✅</div>
+                            <div class="status-text" id="cent-status-text">ONLINE</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">Transactions</div>
+                            <div class="big-number" id="cent-transaction-count">0</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-label">Speed</div>
+                            <div class="big-number" id="cent-avg-time">0</div>
+                            <div class="status-text">ms</div>
+                        </div>
+                    </div>
+
+                    <!-- TRANSACTION LOG -->
+                    <div class="logs-section">
+                        <h3>📝 Transaction Log</h3>
+                        <div id="centralized-logs" class="logs-container">
+                            <p class="empty-state">No transactions yet. Send one! 👆</p>
+                        </div>
+                    </div>
+
+                    <!-- INFO BOX -->
+                    <div class="info-box">
+                        <strong>ℹ️ About Bank Mode:</strong>
+                        <p>One bank controls everything. Super fast but if it breaks, everything stops! 💥</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRYPTO MODE (Decentralized) -->
+            <div class="game-card decentralized-section" id="decentralized-section" style="display: none;">
+                <div class="card-header crypto">
+                    <h2>⛓️ Crypto Mode</h2>
+                </div>
+
+                <div class="card-content">
+                    <!-- NETWORK STATUS -->
+                    <div class="network-display">
+                        <div class="network-info">
+                            <div class="info-label">Active Nodes:</div>
+                            <div class="info-value">
+                                <span id="dec-active-nodes">3</span>/3
+                            </div>
+                        </div>
+                        <div class="network-info">
+                            <div class="info-label">Health:</div>
+                            <div class="info-value" id="dec-health">✅ Healthy</div>
+                        </div>
+                    </div>
+
+                    <!-- NODE BUTTONS -->
+                    <div class="node-controls">
+                        <button onclick="failNode(0)" class="node-btn" id="node-btn-0">
+                            <div class="node-icon">💻</div>
+                            <div class="node-label">Node 1</div>
+                        </button>
+                        <button onclick="failNode(1)" class="node-btn" id="node-btn-1">
+                            <div class="node-icon">💻</div>
+                            <div class="node-label">Node 2</div>
+                        </button>
+                        <button onclick="failNode(2)" class="node-btn" id="node-btn-2">
+                            <div class="node-icon">💻</div>
+                            <div class="node-label">Node 3</div>
+                        </button>
+                    </div>
+
+                    <!-- TRANSACTION LOG -->
+                    <div class="logs-section">
+                        <h3>📝 Transaction Log</h3>
+                        <div id="decentralized-logs" class="logs-container">
+                            <p class="empty-state">No transactions yet. Send one! 👆</p>
+                        </div>
+                    </div>
+
+                    <!-- INFO BOX -->
+                    <div class="info-box">
+                        <strong>ℹ️ About Crypto Mode:</strong>
+                        <p>Many computers agree together. Slow but super strong! Even if one breaks, others keep working! 💪</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FUN FACTS SECTION -->
+        <section class="fun-facts">
+            <h2>🎓 Quick Facts</h2>
+            <div class="facts-grid">
+                <div class="fact-card">
+                    <div class="fact-emoji">🏦</div>
+                    <strong>Banks:</strong>
+                    <p>One company controls your money. Fast & easy, but if they go down...</p>
+                </div>
+                <div class="fact-card">
+                    <div class="fact-emoji">⛓️</div>
+                    <strong>Crypto:</strong>
+                    <p>No one person controls it. Slower, but even if computers break, it survives!</p>
+                </div>
+                <div class="fact-card">
+                    <div class="fact-emoji">🔗</div>
+                    <strong>Blockchain:</strong>
+                    <p>Special code makes sure no one cheats. Everyone can see everything!</p>
+                </div>
+                <div class="fact-card">
+                    <div class="fact-emoji">⚡</div>
+                    <strong>The Trade-off:</strong>
+                    <p>Speed vs Safety. Pick one! Banks = fast, Crypto = safe.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARISON TABLE (SIMPLIFIED) -->
+        <section class="comparison-simple">
+            <h2>📊 Which is Better?</h2>
+            <table class="simple-table">
+                <tr>
+                    <th></th>
+                    <th>🏦 Bank Mode</th>
+                    <th>⛓️ Crypto Mode</th>
+                </tr>
+                <tr>
+                    <td><strong>Speed</strong></td>
+                    <td>⚡ Super Fast</td>
+                    <td>🐢 Slower</td>
+                </tr>
+                <tr>
+                    <td><strong>Breaks?</strong></td>
+                    <td>💥 Everything dies</td>
+                    <td>💪 Keeps going</td>
+                </tr>
+                <tr>
+                    <td><strong>Trust</strong></td>
+                    <td>👤 One company</td>
+                    <td>👥 Everyone</td>
+                </tr>
+                <tr>
+                    <td><strong>Cheat possible?</strong></td>
+                    <td>🤔 Maybe...</td>
+                    <td>🔒 No way!</td>
+                </tr>
+            </table>
+        </section>
+    </div>
+
+    <footer>
+        <p>💡 You just learned how blockchain works! Amazing right? 🚀</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
